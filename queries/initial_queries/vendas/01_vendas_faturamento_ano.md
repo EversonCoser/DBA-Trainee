@@ -1,4 +1,4 @@
-# Total de vendas, faturamento e tiket médio 
+# Total de vendas, faturamento e tiket médio por ano
 
 ## Query versão 1
 - Contagem da quantidade de vendas, utilizando COUNT.
@@ -18,6 +18,7 @@ FROM vendas
     AND data_venda BETWEEN '2024-01-01' 
     AND '2024-12-31';
 ```
+
 ### Query plan 1
 
 ```sql
@@ -94,3 +95,38 @@ Finalize Aggregate  (cost=11922.96..11922.97 rows=1 width=72) (actual time=92.74
 ```
 
 - O desempenho apresentado ao utilizar o índice idx_vendas_covering melhorou, isso ocorre porque todas as colunas necessárias para o processamento da consulta estão presentes no índice, assim, um Parallel Index Only Scan foi realizado e não foi necessário acessar a tabela principal.
+
+## Query versão 2
+
+````sql
+EXPLAIN ANALYZE
+WITH faturamento_anual AS (
+      SELECT
+            valor_total
+      FROM vendas 
+            WHERE status_pedido = 'Pago' 
+            AND data_venda BETWEEN '2024-01-01' 
+            AND '2024-12-31'
+)
+SELECT 
+      COUNT(*) AS total_vendas,
+      SUM(valor_total) AS faturamento_total,
+      ROUND(AVG(valor_total), 2) AS ticket_medio
+FROM faturamento_anual;
+````
+## Query plan 1
+
+````sql
+Finalize Aggregate  (cost=11922.96..11922.97 rows=1 width=72) (actual time=84.448..89.319 rows=1 loops=1)
+   ->  Gather  (cost=11922.73..11922.94 rows=2 width=72) (actual time=84.252..89.305 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         ->  Partial Aggregate  (cost=10922.73..10922.74 rows=1 width=72) (actual time=30.942..30.943 rows=1 loops=3)
+               ->  Parallel Index Only Scan using idx_vendas_covering on vendas  (cost=0.43..10332.69 rows=118007 width=6) (actual time=0.056..17.505 rows=93307 loops=3)
+                     Index Cond: ((status_pedido = 'Pago'::status_pedido_enum) AND (data_venda >= '2024-01-01 00:00:00'::timestamp without time zone) AND (data_venda <= '2024-12-31 00:00:00'::timestamp without time zone))
+                     Heap Fetches: 0
+ Planning Time: 0.276 ms
+ Execution Time: 89.383 ms
+````
+
+- A utilização de CTE apresentou uma pequena melhora de desempenho, muito em razão de possíveis informações presentes em cache, desta forma, tanto a consulta sem CTE quanto a consulta com CTE podem ser consideradas equivalentes. No plano de execução é possível identificar a utilização do índice idx_vendas_covering e posteriormente Partial Aggregate.
