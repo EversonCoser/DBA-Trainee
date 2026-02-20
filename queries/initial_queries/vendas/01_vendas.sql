@@ -23,3 +23,17 @@ FROM vendas
     AND data_venda BETWEEN '2024-01-01' AND '2024-12-31'
     GROUP BY mes
     ORDER BY faturamento DESC;
+
+-- Faturamento e quantidade de vendas por forma de pagamento
+
+EXPLAIN ANALYZE
+SELECT
+    fp.nome AS forma_pagamento,
+    SUM(v.valor_total) AS faturamento,
+    COUNT(*) AS total_vendas
+FROM vendas v
+    JOIN formas_pagamento fp ON fp.id_forma_pagamento = v.id_forma_pagamento
+        WHERE v.status_pedido = 'Pago'
+        AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+        GROUP BY fp.nome
+        ORDER BY faturamento DESC;
