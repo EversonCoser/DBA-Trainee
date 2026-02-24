@@ -73,3 +73,28 @@ WHERE v.status_pedido = 'Pago'
 GROUP BY p.descricao, p.categoria
 ORDER BY total_vendido DESC
 LIMIT 10;
+
+-- 10 produtos com maior faturamento 
+
+WITH produtos_maiores_faturamentos AS (
+    SELECT 
+        v.id_venda
+    FROM vendas v
+        WHERE v.status_pedido = 'Pago'
+            AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+),
+maior_faturamento AS (
+    SELECT 
+        iv.id_produto,
+        SUM(iv.quantidade * iv.preco_unitario_venda) AS faturamento
+    FROM itens_venda iv
+    JOIN produtos_maiores_faturamentos pmf ON pmf.id_venda = iv.id_venda
+    GROUP BY iv.id_produto
+)
+SELECT 
+    p.descricao AS produto,
+    mf.faturamento AS faturamento
+FROM maior_faturamento mf
+JOIN produtos p ON p.id_produto = mf.id_produto
+ORDER BY mf.faturamento DESC
+LIMIT 10;
