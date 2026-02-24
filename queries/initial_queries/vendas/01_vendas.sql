@@ -56,3 +56,20 @@ WHERE v.status_pedido = 'Pago'
 GROUP BY f.id_funcionario, p.nome
 ORDER BY valor_total DESC
 LIMIT 10;
+
+-- 10 produtos mais vendidos e sua categoria
+
+SELECT
+    p.descricao,
+    p.categoria,
+    SUM(iv.quantidade) AS total_vendido
+FROM itens_venda iv
+JOIN produtos p 
+    ON p.id_produto = iv.id_produto
+JOIN vendas v 
+    ON v.id_venda = iv.id_venda
+WHERE v.status_pedido = 'Pago'
+    AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'    
+GROUP BY p.descricao, p.categoria
+ORDER BY total_vendido DESC
+LIMIT 10;

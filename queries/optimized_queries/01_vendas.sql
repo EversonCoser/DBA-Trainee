@@ -66,3 +66,30 @@ JOIN pessoas p
    AND p.ativo = true
 ORDER BY pf.valor_total DESC
 LIMIT 10;
+
+-- 10 produtos mais vendidos por categoria
+
+WITH produtos_mais_vendidos_por_categoria AS (
+    SELECT 
+        v.id_venda
+    FROM vendas v
+        WHERE v.status_pedido = 'Pago'
+            AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+),
+itens_agrupados AS (
+    SELECT 
+        iv.id_produto,
+        SUM(iv.quantidade) AS total_vendido
+    FROM itens_venda iv
+    JOIN produtos_mais_vendidos_por_categoria pmv
+        ON iv.id_venda = pmv.id_venda
+    GROUP BY iv.id_produto
+)
+SELECT
+    p.descricao,
+    p.categoria,
+    ia.total_vendido
+FROM itens_agrupados ia
+JOIN produtos p ON p.id_produto = ia.id_produto
+ORDER BY ia.total_vendido DESC
+LIMIT 10;
