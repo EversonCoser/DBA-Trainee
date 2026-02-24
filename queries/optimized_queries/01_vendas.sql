@@ -24,24 +24,24 @@ FROM vendas
 
 -- Faturamento e quantidade de vendas por forma de pagamento
 
-WITH faturamento_pagamento AS (
+WITH vendas_agrupadas AS (
     SELECT 
-        fp.id_forma_pagamento,
-        fp.nome AS forma_pagamento,
-        v.valor_total 
-    FROM vendas v 
-    JOIN formas_pagamento fp 
-        ON v.id_forma_pagamento = fp.id_forma_pagamento
-    WHERE v.status_pedido = 'Pago'
-        AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+        id_forma_pagamento,
+        SUM(valor_total) AS faturamento,
+        COUNT(*) AS total_vendas
+    FROM vendas
+    WHERE status_pedido = 'Pago'
+      AND data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+    GROUP BY id_forma_pagamento
 )
 SELECT 
-    forma_pagamento,
-    SUM(valor_total) AS faturamento,
-    COUNT(*) AS total_vendas
-FROM faturamento_pagamento
-GROUP BY id_forma_pagamento, forma_pagamento
-ORDER BY faturamento DESC;
+    fp.nome AS forma_pagamento,
+    v.faturamento,
+    v.total_vendas
+FROM vendas_agrupadas v
+JOIN formas_pagamento fp
+    ON fp.id_forma_pagamento = v.id_forma_pagamento
+ORDER BY v.faturamento DESC;
 
 -- Performance por funcionário
 

@@ -125,3 +125,63 @@ CREATE INDEX idx_vendas_relatorio
 ON vendas (status_pedido, data_venda, id_forma_pagamento)
 INCLUDE (valor_total);
 ````
+
+## Query versão 3
+
+`````sql
+WITH vendas_agrupadas AS (
+    SELECT 
+        id_forma_pagamento,
+        SUM(valor_total) AS faturamento,
+        COUNT(*) AS total_vendas
+    FROM vendas
+    WHERE status_pedido = 'Pago'
+      AND data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+    GROUP BY id_forma_pagamento
+)
+SELECT 
+    fp.nome AS forma_pagamento,
+    v.faturamento,
+    v.total_vendas
+FROM vendas_agrupadas v
+JOIN formas_pagamento fp
+    ON fp.id_forma_pagamento = v.id_forma_pagamento
+ORDER BY v.faturamento DESC;
+`````
+
+-- Consulta reorganizada para realizar o agrupamento antes do join.
+
+### Query plan 1
+
+````sql
+Sort  (cost=37756.05..37756.06 rows=5 width=44) (actual time=138.052..144.076 rows=5 loops=1)
+   Sort Key: (sum(vendas.valor_total)) DESC
+   Sort Method: quicksort  Memory: 25kB
+   ->  Nested Loop  (cost=37729.90..37755.99 rows=5 width=44) (actual time=138.010..144.057 rows=5 loops=1)
+         ->  Finalize GroupAggregate  (cost=37729.74..37731.07 rows=5 width=44) (actual time=137.985..144.020 rows=5 loops=1)
+               Group Key: vendas.id_forma_pagamento
+               ->  Gather Merge  (cost=37729.74..37730.91 rows=10 width=44) (actual time=137.974..143.999 rows=15 loops=1)
+                     Workers Planned: 2
+                     Workers Launched: 2
+                     ->  Sort  (cost=36729.72..36729.73 rows=5 width=44) (actual time=79.152..79.153 rows=5 loops=3)
+                           Sort Key: vendas.id_forma_pagamento
+                           Sort Method: quicksort  Memory: 25kB
+                           Worker 0:  Sort Method: quicksort  Memory: 25kB
+                           Worker 1:  Sort Method: quicksort  Memory: 25kB
+                           ->  Partial HashAggregate  (cost=36729.60..36729.66 rows=5 width=44) (actual time=79.117..79.120 rows=5 loops=3)
+                                 Group Key: vendas.id_forma_pagamento
+                                 Batches: 1  Memory Usage: 24kB
+                                 Worker 0:  Batches: 1  Memory Usage: 24kB
+                                 Worker 1:  Batches: 1  Memory Usage: 24kB
+                                 ->  Parallel Bitmap Heap Scan on vendas  (cost=7975.43..35844.55 rows=118007 width=10) (actual time=18.745..53.616 rows=93307 loops=3)
+                                       Recheck Cond: ((status_pedido = 'Pago'::status_pedido_enum) AND (data_venda >= '2024-01-01 00:00:00'::timestamp without time zone) AND (data_venda <= '2024-12-31 00:00:00'::timestamp without time zone))
+                                       Heap Blocks: exact=5668
+                                       ->  Bitmap Index Scan on idx_vendas_status_data  (cost=0.00..7904.63 rows=283216 width=0) (actual time=50.629..50.629 rows=279922 loops=1)
+                                             Index Cond: ((status_pedido = 'Pago'::status_pedido_enum) AND (data_venda >= '2024-01-01 00:00:00'::timestamp without time zone) AND (data_venda <= '2024-12-31 00:00:00'::timestamp without time zone))
+         ->  Index Scan using pk_formas_pagamento_id_forma_pagamento on formas_pagamento fp  (cost=0.15..4.97 rows=1 width=8) (actual time=0.005..0.005 rows=1 loops=5)
+               Index Cond: (id_forma_pagamento = vendas.id_forma_pagamento)
+ Planning Time: 0.857 ms
+ Execution Time: 144.310 ms
+ ````
+
+ - Consulta executada em 144.310 ms
