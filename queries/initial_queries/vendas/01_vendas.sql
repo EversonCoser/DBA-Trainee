@@ -37,3 +37,22 @@ FROM vendas v
         AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
         GROUP BY fp.nome
         ORDER BY faturamento DESC;
+
+-- Performance por funcionário
+
+SELECT
+    f.id_funcionario,
+    p.nome,
+    SUM(v.valor_total) AS valor_total,
+    COUNT(*) AS total_vendas
+FROM vendas v
+JOIN funcionarios f 
+    ON f.id_funcionario = v.id_funcionario
+JOIN pessoas p 
+    ON p.id_pessoa = f.id_funcionario
+    AND p.ativo = true
+WHERE v.status_pedido = 'Pago'
+    AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY f.id_funcionario, p.nome
+ORDER BY valor_total DESC
+LIMIT 10;

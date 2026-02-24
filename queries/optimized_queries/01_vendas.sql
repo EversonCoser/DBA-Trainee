@@ -42,3 +42,27 @@ SELECT
 FROM faturamento_pagamento
 GROUP BY id_forma_pagamento, forma_pagamento
 ORDER BY faturamento DESC;
+
+-- Performance por funcionário
+
+WITH performance_funcionario AS (
+    SELECT
+        id_funcionario,
+        SUM(valor_total) AS valor_total,
+        COUNT(*) AS total_vendas
+    FROM vendas
+    WHERE status_pedido = 'Pago'
+      AND data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+    GROUP BY id_funcionario
+)
+SELECT
+    pf.id_funcionario,
+    p.nome,
+    pf.valor_total,
+    pf.total_vendas
+FROM performance_funcionario pf
+JOIN pessoas p
+    ON p.id_pessoa = pf.id_funcionario
+   AND p.ativo = true
+ORDER BY pf.valor_total DESC
+LIMIT 10;
