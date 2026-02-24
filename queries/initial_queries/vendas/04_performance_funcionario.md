@@ -1,4 +1,4 @@
-# 
+# Performance por funcionário
 
 ## Query versão 1
 - Contagem da quantidade de vendas, utilizando COUNT.
