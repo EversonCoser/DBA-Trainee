@@ -98,3 +98,18 @@ FROM maior_faturamento mf
 JOIN produtos p ON p.id_produto = mf.id_produto
 ORDER BY mf.faturamento DESC
 LIMIT 10;
+
+-- Faturamente por categoria
+
+SELECT 
+    pr.categoria,
+    SUM(iv.quantidade * iv.preco_unitario_venda) AS faturamento_total
+FROM vendas v
+JOIN itens_venda iv 
+    ON iv.id_venda = v.id_venda
+JOIN produtos pr 
+    ON pr.id_produto = iv.id_produto
+WHERE v.status_pedido = 'Pago'
+  AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY pr.categoria
+ORDER BY faturamento_total DESC;
