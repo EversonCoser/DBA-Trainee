@@ -113,3 +113,21 @@ WHERE v.status_pedido = 'Pago'
   AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
 GROUP BY pr.categoria
 ORDER BY faturamento_total DESC;
+
+-- Os 10 clientes com maior valor total gasto
+
+WITH ranking AS (
+    SELECT 
+        v.id_cliente,
+        SUM(v.valor_total) AS total_gasto
+    FROM vendas v
+    WHERE v.status_pedido = 'Pago'
+      AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+    GROUP BY v.id_cliente
+    ORDER BY total_gasto DESC
+    LIMIT 10
+)
+SELECT p.nome, r.total_gasto
+FROM ranking r
+JOIN pessoas p ON p.id_pessoa = r.id_cliente
+ORDER BY r.total_gasto DESC;
