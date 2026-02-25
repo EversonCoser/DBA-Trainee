@@ -131,3 +131,14 @@ SELECT p.nome, r.total_gasto
 FROM ranking r
 JOIN pessoas p ON p.id_pessoa = r.id_cliente
 ORDER BY r.total_gasto DESC;
+
+-- Porcentagem de vendas canceladas
+
+SELECT 
+    COUNT(*) AS total_vendas,
+    COUNT(*) FILTER (WHERE status_pedido = 'Cancelado') AS canceladas,
+    ROUND(
+        (COUNT(*) FILTER (WHERE status_pedido = 'Cancelado')::DECIMAL 
+        / NULLIF(COUNT(*),0)) * 100, 
+    2) AS percentual_cancelado
+FROM vendas;
