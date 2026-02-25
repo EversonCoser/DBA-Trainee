@@ -4,7 +4,7 @@
 - Valor total do faturamento utilizando SUM.
 - Utilização de índices já criados.
 - Tabela produtos com 650 registros.
-- Tabela pessoas com 4.499.943 registros.
+- Tabela itens_venda com 4.499.943 registros.
 - Tabela vendas com 1.500.000 registros.
 
 ````sql
