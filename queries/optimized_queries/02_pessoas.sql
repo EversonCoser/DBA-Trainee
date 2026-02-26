@@ -19,3 +19,16 @@ SELECT
         / NULLIF(COUNT(*),0)) * 100,
     2) AS percentual_fisicos 
 FROM pessoas;
+
+-- Quantidade de pessoas cadastradas por mês
+
+WITH cadastros AS (
+    SELECT 
+        DATE_TRUNC('month', data_cadastro) AS mes,
+        COUNT(*) AS total
+    FROM pessoas
+    WHERE data_cadastro BETWEEN '2023-01-01' AND '2023-12-31'
+    GROUP BY mes
+)
+SELECT *
+FROM cadastros
