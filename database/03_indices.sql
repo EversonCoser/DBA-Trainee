@@ -25,6 +25,9 @@ CREATE INDEX idx_pessoas_ativas
 ON pessoas (id_pessoa)
 WHERE ativo = true;
 
+CREATE INDEX idx_pessoas_data_cadastro
+ON pessoas (data_cadastro);
+
 -- itens_venda
 
 CREATE INDEX idx_itens_venda_produto
