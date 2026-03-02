@@ -39,3 +39,11 @@ ON itens_venda (id_venda);
 CREATE INDEX idx_itens_venda_idvenda_produto
 ON itens_venda (id_venda, id_produto)
 INCLUDE (quantidade);
+
+-- clientes
+
+CREATE INDEX idx_clientes_id_cliente
+ON clientes (id_cliente);
+
+CREATE INDEX idx_clientes_data_nascimento
+ON clientes (data_nascimento);
