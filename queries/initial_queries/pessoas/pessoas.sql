@@ -55,3 +55,17 @@ FROM pessoas p
 JOIN clientes c ON c.id_cliente = p.id_pessoa
 ORDER BY c.pontos_fidelidade DESC, p.id_pessoa ASC
 LIMIT 15;
+
+-- Salário total e médio por cargo
+
+SELECT
+    f.cargo,
+    COUNT(*) AS total_funcionarios,
+    SUM(f.salario) AS folha_total,
+    AVG(f.salario) AS salario_medio
+FROM funcionarios f
+JOIN pessoas p 
+    ON p.id_pessoa = f.id_funcionario
+    AND p.ativo = true
+GROUP BY f.cargo
+ORDER BY folha_total DESC;
