@@ -29,3 +29,19 @@ FROM pessoas
 WHERE data_cadastro BETWEEN '2023-01-01' AND '2023-12-31'
 GROUP BY mes
 ORDER BY mes;
+
+-- Distribuição de idade dos clientes
+
+SELECT 
+    CASE 
+        WHEN EXTRACT(YEAR FROM AGE(c.data_nascimento)) BETWEEN 18 AND 25 THEN '18-25'
+        WHEN EXTRACT(YEAR FROM AGE(c.data_nascimento)) BETWEEN 26 AND 35 THEN '26-35'
+        WHEN EXTRACT(YEAR FROM AGE(c.data_nascimento)) BETWEEN 36 AND 50 THEN '36-50'
+        ELSE '50+'
+    END AS faixa_etaria,
+    COUNT(*) AS total
+FROM clientes c
+JOIN pessoas p ON p.id_pessoa = c.id_cliente
+WHERE p.ativo = true
+GROUP BY faixa_etaria
+ORDER BY total DESC;

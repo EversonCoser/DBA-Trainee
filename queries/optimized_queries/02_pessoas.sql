@@ -32,3 +32,22 @@ WITH cadastros AS (
 )
 SELECT *
 FROM cadastros
+
+-- Distribuição de idade dos clientes
+
+SELECT 
+    CASE 
+        WHEN data_nascimento BETWEEN CURRENT_DATE - INTERVAL '25 years' 
+                                 AND CURRENT_DATE - INTERVAL '18 years' THEN '18-25'
+        WHEN data_nascimento BETWEEN CURRENT_DATE - INTERVAL '35 years' 
+                                 AND CURRENT_DATE - INTERVAL '26 years' THEN '26-35'
+        WHEN data_nascimento BETWEEN CURRENT_DATE - INTERVAL '50 years' 
+                                 AND CURRENT_DATE - INTERVAL '36 years' THEN '36-50'
+        ELSE '50+'
+    END AS faixa_etaria,
+    COUNT(*) AS total
+FROM clientes
+JOIN pessoas ON pessoas.id_pessoa = clientes.id_cliente
+WHERE pessoas.ativo = true
+GROUP BY faixa_etaria
+ORDER BY total DESC;
