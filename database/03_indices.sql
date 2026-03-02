@@ -55,3 +55,8 @@ ON clientes (pontos_fidelidade DESC, id_cliente ASC);
 
 CREATE INDEX idx_funcionarios_data
 ON funcionarios (data_contratacao);
+
+-- fornecedores
+
+CREATE INDEX idx_fornecedores_prazo_id
+ON fornecedores (prazo_entrega DESC, id_fornecedor ASC);
