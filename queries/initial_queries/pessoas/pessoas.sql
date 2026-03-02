@@ -45,3 +45,13 @@ JOIN pessoas p ON p.id_pessoa = c.id_cliente
 WHERE p.ativo = true
 GROUP BY faixa_etaria
 ORDER BY total DESC;
+
+-- Top 15 clientes por pontos de fidelidade
+
+SELECT 
+    p.nome AS nome_cliente,
+    c.pontos_fidelidade AS pontos
+FROM pessoas p
+JOIN clientes c ON c.id_cliente = p.id_pessoa
+ORDER BY c.pontos_fidelidade DESC, p.id_pessoa ASC
+LIMIT 15;
