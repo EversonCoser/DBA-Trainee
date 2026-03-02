@@ -69,3 +69,16 @@ JOIN pessoas p
     AND p.ativo = true
 GROUP BY f.cargo
 ORDER BY folha_total DESC;
+
+-- 10 funcionários com mais tempo de empresa
+
+SELECT
+    p.nome,
+    f.cargo,
+    AGE(CURRENT_DATE, f.data_contratacao) AS tempo_casa
+FROM pessoas p
+JOIN funcionarios f 
+    ON f.id_funcionario = p.id_pessoa
+WHERE p.ativo = true
+ORDER BY tempo_casa DESC
+LIMIT 10;
