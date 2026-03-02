@@ -47,3 +47,6 @@ ON clientes (id_cliente);
 
 CREATE INDEX idx_clientes_data_nascimento
 ON clientes (data_nascimento);
+
+CREATE INDEX idx_clientes_pontos_id
+ON clientes (pontos_fidelidade DESC, id_cliente ASC);
