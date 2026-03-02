@@ -50,3 +50,8 @@ ON clientes (data_nascimento);
 
 CREATE INDEX idx_clientes_pontos_id
 ON clientes (pontos_fidelidade DESC, id_cliente ASC);
+
+-- funcionarios
+
+CREATE INDEX idx_funcionarios_data
+ON funcionarios (data_contratacao);
