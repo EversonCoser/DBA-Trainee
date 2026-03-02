@@ -82,3 +82,23 @@ JOIN funcionarios f
 WHERE p.ativo = true
 ORDER BY tempo_casa DESC
 LIMIT 10;
+
+-- Fornecedores com prazo de entrega acima da média
+
+SELECT
+    f.id_fornecedor,
+    p.nome,
+    f.prazo_entrega
+FROM fornecedores f
+JOIN pessoas p 
+    ON p.id_pessoa = f.id_fornecedor
+WHERE p.ativo = true
+  AND f.prazo_entrega > (
+        SELECT AVG(f2.prazo_entrega)
+        FROM fornecedores f2
+        JOIN pessoas p2
+            ON p2.id_pessoa = f2.id_fornecedor
+        WHERE p2.ativo = true
+    )
+ORDER BY f.prazo_entrega DESC, f.id_fornecedor ASC
+LIMIT 10;
