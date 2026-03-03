@@ -60,3 +60,9 @@ ON funcionarios (data_contratacao);
 
 CREATE INDEX idx_fornecedores_prazo_id
 ON fornecedores (prazo_entrega DESC, id_fornecedor ASC);
+
+-- produtos
+
+CREATE INDEX idx_produtos_ativo_estoque
+ON produtos (estoque)
+WHERE ativo = TRUE;
