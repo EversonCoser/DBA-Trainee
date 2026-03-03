@@ -31,4 +31,23 @@ SELECT
 FROM produtos p 
 JOIN produtos_comprados pc
 	ON p.id_produto = pc.id_produto 
-ORDER BY qtd_comprada DESC, valor_gasto DESC, pc.id_produto ASC 
+ORDER BY qtd_comprada DESC, valor_gasto DESC, pc.id_produto ASC; 
+
+-- Valor gasto por fornecedor
+
+WITH gasto_fornecedor AS (
+    SELECT
+        c.id_fornecedor,
+        SUM(c.valor_total) AS total_gasto
+    FROM compras c
+    GROUP BY c.id_fornecedor
+)
+SELECT
+    p.nome,
+    gf.total_gasto
+FROM gasto_fornecedor gf
+JOIN pessoas p
+    ON p.id_pessoa = gf.id_fornecedor
+WHERE p.ativo = true
+ORDER BY gf.total_gasto DESC
+LIMIT 10;

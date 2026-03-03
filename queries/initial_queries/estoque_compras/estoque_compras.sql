@@ -31,3 +31,14 @@ JOIN (
 GROUP BY p.descricao, p.estoque 
 ORDER BY qtd_comprada DESC, total_gasto DESC
 LIMIT 10; 
+
+-- Valor gasto por fornecedor
+
+SELECT
+    p.nome,
+    SUM(c.valor_total) AS total_gasto
+FROM compras c
+JOIN pessoas p 
+    ON p.id_pessoa = c.id_fornecedor
+GROUP BY p.nome
+ORDER BY total_gasto DESC;
