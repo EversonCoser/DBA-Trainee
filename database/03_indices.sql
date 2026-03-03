@@ -72,6 +72,9 @@ WHERE ativo = TRUE;
 CREATE INDEX idx_compras_data_id
 ON compras (data_compra, id_compra);
 
+CREATE INDEX idx_compras_id_fornecedor
+ON compras (id_fornecedor);
+
 -- itens_compra
 
 CREATE INDEX idx_itens_compra_id_compra_produto
