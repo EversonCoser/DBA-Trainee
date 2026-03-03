@@ -66,3 +66,13 @@ ON fornecedores (prazo_entrega DESC, id_fornecedor ASC);
 CREATE INDEX idx_produtos_ativo_estoque
 ON produtos (estoque)
 WHERE ativo = TRUE;
+
+-- compras
+
+CREATE INDEX idx_compras_data_id
+ON compras (data_compra, id_compra);
+
+-- itens_compra
+
+CREATE INDEX idx_itens_compra_id_compra_produto
+ON itens_compra (id_compra, id_produto);
