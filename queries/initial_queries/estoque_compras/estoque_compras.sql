@@ -96,4 +96,15 @@ FROM pessoas p
 JOIN funcionario_compras fc
 	ON fc.id_funcionario = p.id_pessoa 
 WHERE p.ativo = TRUE 
-ORDER BY p.id_pessoa 
+ORDER BY p.id_pessoa; 
+
+-- Investimento mensal em compras
+
+SELECT  
+	date_trunc('month', data_compra) AS mes,
+	count(*) AS total_compras,
+	sum(c.valor_total) AS total_gasto
+FROM compras c 
+WHERE c.data_compra BETWEEN '2025-01-01' AND '2025-12-01'
+GROUP BY mes
+ORDER BY total_gasto; 
