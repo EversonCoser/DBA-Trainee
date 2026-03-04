@@ -42,3 +42,16 @@ JOIN pessoas p
     ON p.id_pessoa = c.id_fornecedor
 GROUP BY p.nome
 ORDER BY total_gasto DESC;
+
+-- Produtos com mais de um fornecedor primário
+
+SELECT 
+    p.id_produto,
+    p.descricao,
+    p.categoria
+FROM produtos p
+JOIN fornecimento f 
+    ON f.id_produto = p.id_produto
+WHERE f.prioridade = 'Primaria'
+GROUP BY p.id_produto, p.descricao
+HAVING COUNT(DISTINCT f.id_fornecedor) > 1;

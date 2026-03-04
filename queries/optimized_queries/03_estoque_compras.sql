@@ -51,3 +51,25 @@ JOIN pessoas p
 WHERE p.ativo = true
 ORDER BY gf.total_gasto DESC
 LIMIT 10;
+
+-- Produtos com mais de um fornecedor primário
+
+WITH produtos_fornecimento_primario AS (
+    SELECT 
+        f.id_produto
+    FROM fornecimento f
+    WHERE f.prioridade = 'Primaria'
+    GROUP BY f.id_produto
+    HAVING COUNT(DISTINCT f.id_fornecedor) > 1
+)
+SELECT 
+    p.descricao,
+    p.categoria
+FROM produtos p
+WHERE p.ativo = true
+  AND EXISTS (
+      SELECT 1
+      FROM produtos_fornecimento_primario pfp
+      WHERE pfp.id_produto = p.id_produto
+  )
+ORDER BY p.id_produto;
