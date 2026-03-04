@@ -79,3 +79,9 @@ ON compras (id_fornecedor);
 
 CREATE INDEX idx_itens_compra_id_compra_produto
 ON itens_compra (id_compra, id_produto);
+
+-- fornecimento
+
+CREATE INDEX idx_fornecimento_produto_prioridade
+ON fornecimento (id_produto, id_fornecedor)
+WHERE prioridade = 'Primaria';
