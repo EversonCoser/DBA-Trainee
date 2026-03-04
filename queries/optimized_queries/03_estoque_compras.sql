@@ -73,3 +73,24 @@ WHERE p.ativo = true
       WHERE pfp.id_produto = p.id_produto
   )
 ORDER BY p.id_produto;
+
+-- Produtos com apenas 1 fornecedor
+
+WITH produtos_fornecedores_unicos AS (
+	SELECT 
+	    f.id_produto
+	FROM fornecimento f 
+	GROUP BY f.id_produto 
+	HAVING COUNT(DISTINCT f.id_fornecedor) = 1
+)
+SELECT 
+	p.descricao,
+	p.categoria
+FROM produtos p 
+WHERE p.ativo = TRUE
+AND EXISTS (
+	SELECT 1
+	FROM produtos_fornecedores_unicos pfu
+	WHERE p.id_produto = pfu.id_produto 
+)
+ORDER BY p.id_produto;
