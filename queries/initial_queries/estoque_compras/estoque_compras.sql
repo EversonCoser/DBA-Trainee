@@ -76,3 +76,24 @@ AND EXISTS (
 	WHERE p.id_produto = pfu.id_produto 
 )
 ORDER BY p.id_produto;
+
+-- Funcionários que mais realizaram compras e valor total gasto
+
+WITH funcionario_compras AS (
+	SELECT 
+		c.id_funcionario,
+		COUNT(*) AS qtd_compras,
+		SUM(c.valor_total) AS valor_total_gasto
+	FROM compras c 
+	WHERE c.data_compra BETWEEN '2022-01-01' AND '2022-12-31'
+	GROUP BY c.id_funcionario 
+)
+SELECT 
+	p.nome,
+	fc.qtd_compras,
+	fc.valor_total_gasto
+FROM pessoas p 
+JOIN funcionario_compras fc
+	ON fc.id_funcionario = p.id_pessoa 
+WHERE p.ativo = TRUE 
+ORDER BY p.id_pessoa 
