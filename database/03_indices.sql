@@ -67,6 +67,9 @@ CREATE INDEX idx_produtos_ativo_estoque
 ON produtos (estoque)
 WHERE ativo = TRUE;
 
+CREATE INDEX idx_produtos_ativo
+ON produtos (ativo);
+
 -- compras
 
 CREATE INDEX idx_compras_data_id
@@ -85,3 +88,6 @@ ON itens_compra (id_compra, id_produto);
 CREATE INDEX idx_fornecimento_produto_prioridade
 ON fornecimento (id_produto, id_fornecedor)
 WHERE prioridade = 'Primaria';
+
+CREATE INDEX idx_fornecimento_produto_fornecedor
+ON fornecimento (id_produto, id_fornecedor);
