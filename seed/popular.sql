@@ -7,13 +7,15 @@ CREATE OR REPLACE PROCEDURE popular_banco(
     p_qtd_fornecedores INT,
     p_qtd_produtos INT,
     p_qtd_compras INT,
-    p_qtd_vendas INT
+    p_qtd_vendas INT,
+    p_qtd_fornecedores_fornecimento INT,
+    p_qtd_produtos_fornecimento INT
 )
 AS $$
 BEGIN
     CALL gera_pessoas_especializadas(p_qtd_clientes, p_qtd_funcionarios, p_qtd_fornecedores);
     CALL gerar_produtos(p_qtd_produtos);
-    CALL gerar_fornecimento();
+    CALL gerar_fornecimento(p_qtd_fornecedores_fornecimento, p_qtd_produtos_fornecimento);
     CALL gerar_compras(p_qtd_compras);
     CALL gera_vendas(p_qtd_vendas);
     
@@ -170,7 +172,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE PROCEDURE gerar_fornecimento()
+CREATE OR REPLACE PROCEDURE gerar_fornecimento(
+    qtd_fornecedores INT,
+    qtd_produtos INT
+)
 AS $$
 BEGIN
 
@@ -183,16 +188,25 @@ BEGIN
         f.id_fornecedor,
         p.id_produto,
         (ARRAY['Primaria', 'Secundaria', 'Terciaria', 'Outros'])
-            [floor(random()*4+1)::INT]::prioridade_enum
-    FROM fornecedores f
-    JOIN LATERAL (
-        SELECT id_produto
-        FROM produtos
+            [floor(random()*4 + 1)::INT]::prioridade_enum
+    FROM (
+        SELECT id_fornecedor
+        FROM fornecedores
         ORDER BY random()
-        LIMIT floor(random()*3 + 1)
-    ) p ON TRUE
-    ON CONFLICT (id_fornecedor, id_produto) DO NOTHING;
-
+        LIMIT qtd_fornecedores
+    ) f
+    CROSS JOIN LATERAL (
+        SELECT pr.id_produto
+        FROM produtos pr
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM fornecimento fo
+            WHERE fo.id_fornecedor = f.id_fornecedor
+              AND fo.id_produto = pr.id_produto
+        )
+        ORDER BY random()
+        LIMIT qtd_produtos
+    ) p;
 END;
 $$ LANGUAGE plpgsql;
 
