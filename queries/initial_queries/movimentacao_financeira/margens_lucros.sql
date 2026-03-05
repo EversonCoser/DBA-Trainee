@@ -66,3 +66,24 @@ FROM (
 ) menores
 ORDER BY lucro DESC
 );
+
+-- Movimentação financeira da empresa
+
+WITH receitas_gerais AS (
+	SELECT 
+		sum(v.valor_total) AS receita_total 
+	FROM vendas v
+	WHERE v.data_venda BETWEEN '2025-01-01' AND '2025-02-01'
+		AND v.status_pedido = 'Pago'
+),
+gastos_totais AS (
+	SELECT 
+		sum(c.valor_total) AS gastos_totais
+	FROM compras c
+	WHERE c.data_compra  BETWEEN '2025-01-01' AND '2025-02-01'
+)
+SELECT 
+	rg.receita_total,
+	gt.gastos_totais,
+	(rg.receita_total - gt.gastos_totais) AS lucro
+FROM receitas_gerais rg, gastos_totais gt
