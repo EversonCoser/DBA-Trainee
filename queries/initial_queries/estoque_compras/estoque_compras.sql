@@ -108,3 +108,20 @@ FROM compras c
 WHERE c.data_compra BETWEEN '2025-01-01' AND '2025-12-01'
 GROUP BY mes
 ORDER BY total_gasto; 
+
+-- Produtos sem movimentação de venda
+
+SELECT 
+    p.descricao,
+    p.categoria,
+    p.estoque
+FROM produtos p
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM itens_venda iv
+    JOIN vendas v
+        ON v.id_venda = iv.id_venda
+    WHERE iv.id_produto = p.id_produto
+      AND v.status_pedido = 'Pago'
+      AND v.data_venda BETWEEN '2025-01-01' AND '2026-01-01'
+);
