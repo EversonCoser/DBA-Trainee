@@ -73,7 +73,8 @@ ON produtos (ativo);
 -- compras
 
 CREATE INDEX idx_compras_data_id
-ON compras (data_compra, id_compra);
+ON compras (data_compra, id_compra)
+INCLUDE (valor_total);
 
 CREATE INDEX idx_compras_id_fornecedor
 ON compras (id_fornecedor);
