@@ -116,3 +116,30 @@ FROM receita_mensal rm
 JOIN custo_mensal cm
 	ON rm.mes = cm.mes 
 ORDER BY lucro_mensal DESC;
+
+-- Custo médio por produto e receita média por produto 
+
+WITH custo_medio_compra AS (
+	SELECT 
+		ic.id_produto,
+		round(avg(ic.valor_unitario),2) AS media_custo 
+	FROM itens_compra ic
+	GROUP BY ic.id_produto 
+),
+receita_media AS (
+	SELECT 	
+		iv.id_produto,
+		round(avg(iv.preco_unitario_venda),2) AS valor_medio
+	FROM itens_venda iv 
+	GROUP BY iv.id_produto
+)
+SELECT 	
+	p.descricao,
+	cmc.media_custo,
+	rm.valor_medio
+FROM produtos p 
+JOIN custo_medio_compra cmc
+	ON p.id_produto = cmc.id_produto 
+JOIN receita_media rm
+	ON p.id_produto = rm.id_produto
+ORDER BY cmc.id_produto; 
