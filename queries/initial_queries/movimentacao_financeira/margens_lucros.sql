@@ -86,4 +86,33 @@ SELECT
 	rg.receita_total,
 	gt.gastos_totais,
 	(rg.receita_total - gt.gastos_totais) AS lucro
-FROM receitas_gerais rg, gastos_totais gt
+FROM receitas_gerais rg, gastos_totais gt;
+
+-- Receita mensal, gasto mensal e lucro mensal
+
+WITH receita_mensal AS (
+	SELECT 
+		date_trunc('month', v.data_venda) AS mes,
+		sum(v.valor_total) AS receita_mensal
+	FROM vendas v 
+	WHERE v.data_venda BETWEEN '2025-01-01' AND '2026-01-01'
+		AND v.status_pedido = 'Pago'
+	GROUP BY 1 
+),
+custo_mensal AS (
+	SELECT 
+		date_trunc('month', c.data_compra) AS mes,
+		sum(c.valor_total) AS custo_mensal 
+	FROM compras c
+	WHERE c.data_compra BETWEEN '2025-01-01' AND '2026-01-01'
+	GROUP BY 1 
+)
+SELECT 
+	rm.mes,
+	rm.receita_mensal,
+	cm.custo_mensal,
+	(rm.receita_mensal - cm.custo_mensal) AS lucro_mensal
+FROM receita_mensal rm
+JOIN custo_mensal cm
+	ON rm.mes = cm.mes 
+ORDER BY lucro_mensal DESC;
