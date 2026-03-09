@@ -248,3 +248,28 @@ SELECT
 	lag(tvc.qtd_total_vendas, 12, 0) OVER (ORDER BY mes) AS vendas_mes_anterior
 FROM total_vendas_comparadas tvc
 ORDER BY mes;
+
+-- Acumulado de vendas e média móvel de 3 meses
+
+WITH acumulado_vendas AS (
+	SELECT 
+		date_trunc('month', data_venda) AS mes,
+		COUNT(*) AS qtd_vendas
+	FROM vendas
+	WHERE status_pedido = 'Pago'
+	  AND data_venda >= '2024-01-01'
+	  AND data_venda <  '2025-01-01'
+	GROUP BY mes
+)
+SELECT 
+	mes,
+	qtd_vendas,
+	SUM(qtd_vendas) OVER (ORDER BY mes) AS acumulado_vendas,
+	ROUND(
+		AVG(qtd_vendas) OVER (
+			ORDER BY mes 
+			ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+		), 2
+	) AS media_3_meses
+FROM acumulado_vendas
+ORDER BY mes;
