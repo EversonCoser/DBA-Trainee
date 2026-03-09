@@ -67,7 +67,7 @@ JOIN pessoas p
 ORDER BY pf.valor_total DESC
 LIMIT 10;
 
--- 10 produtos mais vendidos por categoria
+-- 10 produtos mais vendidos e sua categoria
 
 WITH produtos_mais_vendidos_por_categoria AS (
     SELECT 
