@@ -102,3 +102,24 @@ WHERE p.ativo = true
     )
 ORDER BY f.prazo_entrega DESC, f.id_fornecedor ASC
 LIMIT 10;
+
+-- Top 3 funcionários com maior salário para cada cargo
+
+WITH funcionarios_ativos AS (
+	SELECT 
+		p.nome,
+		f.cargo,
+		f.salario,
+		rank() OVER (PARTITION BY cargo ORDER BY salario DESC) AS posicao
+	FROM funcionarios f 
+	JOIN pessoas p 
+		ON f.id_funcionario = p.id_pessoa 
+	WHERE p.ativo = TRUE 
+)
+SELECT  
+	nome,
+	cargo,
+	salario,
+	posicao 
+FROM funcionarios_ativos 
+WHERE posicao <= 3;
