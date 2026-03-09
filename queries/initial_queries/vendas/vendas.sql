@@ -174,3 +174,58 @@ FROM ranking r
 JOIN produtos p 
     ON p.id_produto = r.id_produto
 WHERE r.posicao <= 5;
+
+-- Comparação de vendas mês a mês
+
+WITH total_vendas_comparadas AS (
+	SELECT 
+		to_char(data_venda, 'MM/YYYY') AS mes,
+		count(*) AS qtd_total_vendas
+	FROM vendas v 
+	WHERE v.status_pedido = 'Pago'
+		AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+	GROUP BY mes
+	ORDER BY mes 
+)
+SELECT 
+	tvc.mes,
+	tvc.qtd_total_vendas,
+	lag(tvc.qtd_total_vendas) OVER (ORDER BY mes) AS vendas_mes_anterior
+FROM total_vendas_comparadas tvc
+ORDER BY mes;
+
+-- Comparação de vendas ano a ano
+
+WITH total_vendas_comparadas AS (
+	SELECT 
+		date_trunc('year', data_venda) AS ano,
+		count(*) AS qtd_total_vendas
+	FROM vendas v 
+	WHERE v.status_pedido = 'Pago'
+	GROUP BY ano
+)
+SELECT 
+	tvc.ano,
+	tvc.qtd_total_vendas,
+	lag(tvc.qtd_total_vendas) OVER (ORDER BY ano) AS vendas_ano_anterior
+FROM total_vendas_comparadas tvc
+ORDER BY ano;
+
+-- Comparação de vendas mês a mês nos últimos 3 anos
+
+WITH total_vendas_comparadas AS (
+	SELECT 
+		date_trunc('month', v.data_venda ) AS mes,
+		count(*) AS qtd_total_vendas
+	FROM vendas v 
+	WHERE v.status_pedido = 'Pago'
+		AND v.data_venda BETWEEN '2023-01-01' AND '2026-01-01'
+	GROUP BY mes
+	ORDER BY mes 
+)
+SELECT 
+	tvc.mes,
+	tvc.qtd_total_vendas,
+	lag(tvc.qtd_total_vendas, 12, 0) OVER (ORDER BY mes) AS vendas_mes_anterior
+FROM total_vendas_comparadas tvc
+ORDER BY mes;
