@@ -3,10 +3,7 @@
 ### Query versão 1
 
 ````sql
--- Margem de lucro por produto para vendas realizadas entre 01/01/2025 e 01/02/2025, 
--- considerando apenas pedidos pagos. A consulta retorna os 10 produtos com maior margem 
--- de lucro e os 10 produtos com menor margem de lucro, ordenados por lucro.
-
+EXPLAIN ANALYZE 
 WITH vendas_filtradas AS (
     SELECT id_venda
     FROM vendas
@@ -45,21 +42,17 @@ lucro AS (
         ON r.id_produto = g.id_produto
 )
 (
-SELECT
-    p.descricao,
-    l.lucro
-FROM lucro l
-JOIN produtos p
-    ON p.id_produto = l.id_produto
-ORDER BY l.lucro DESC
-LIMIT 10
+    SELECT
+        p.descricao,
+        l.lucro
+    FROM lucro l
+    JOIN produtos p
+        ON p.id_produto = l.id_produto
+    ORDER BY l.lucro DESC
+    LIMIT 10
 )
-
 UNION ALL
-
 (
-SELECT *
-FROM (
     SELECT
         p.descricao,
         l.lucro
@@ -68,9 +61,8 @@ FROM (
         ON p.id_produto = l.id_produto
     ORDER BY l.lucro ASC
     LIMIT 10
-) menores
-ORDER BY lucro DESC
-);
+)
+ORDER BY lucro DESC;
 ````
 
 ### Query plan 1
