@@ -184,4 +184,6 @@ Sort  (cost=37756.05..37756.06 rows=5 width=44) (actual time=138.052..144.076 ro
  Execution Time: 144.310 ms
  ````
 
- - Consulta executada em 144.310 ms
+ - Consulta executada em 144.310 ms, utilização do índice pk_formas_pagamento_id_forma_pagamento em formas_pagamento e idx_vendas_status_data em vendas.
+
+ 
