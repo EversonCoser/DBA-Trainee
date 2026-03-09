@@ -142,3 +142,35 @@ SELECT
         / NULLIF(COUNT(*),0)) * 100, 
     2) AS percentual_cancelado
 FROM vendas;
+
+-- Top 5 produtos mais vendidos por categoria
+
+WITH mais_vendidos AS (
+    SELECT 
+        iv.id_produto,
+        SUM(iv.quantidade) AS qtd_produtos
+    FROM itens_venda iv
+    JOIN vendas v 
+        ON iv.id_venda = v.id_venda
+    WHERE v.status_pedido = 'Pago'
+      AND v.data_venda BETWEEN '2024-01-01' AND '2024-12-31'
+    GROUP BY iv.id_produto
+),
+ranking AS (
+    SELECT 
+        mv.id_produto,
+        mv.qtd_produtos,
+        RANK() OVER (PARTITION BY p.categoria ORDER BY mv.qtd_produtos DESC) AS posicao
+    FROM mais_vendidos mv
+    JOIN produtos p 
+        ON mv.id_produto = p.id_produto
+)
+SELECT 
+    p.descricao,
+    r.qtd_produtos,
+    p.categoria,
+    r.posicao
+FROM ranking r
+JOIN produtos p 
+    ON p.id_produto = r.id_produto
+WHERE r.posicao <= 5;
