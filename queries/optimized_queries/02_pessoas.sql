@@ -128,3 +128,25 @@ SELECT
 	posicao 
 FROM funcionarios_ativos 
 WHERE posicao <= 3;
+
+-- Top 20 clientes que mais gastaram no último ano
+
+WITH clientes_gastos AS (
+	SELECT 
+		v.id_cliente,
+		SUM(v.valor_total) AS qtd_gasta,
+		rank() OVER (ORDER BY SUM(v.valor_total) DESC) AS posicao
+	FROM vendas v
+	WHERE v.status_pedido = 'Pago'
+		AND v.data_venda BETWEEN '2024-01-01' AND '2025-01-01'
+	GROUP BY id_cliente 
+)
+SELECT 
+	p.nome,
+	cg.qtd_gasta,
+	cg.posicao 
+FROM pessoas p 
+JOIN clientes_gastos cg
+	ON p.id_pessoa = cg.id_cliente 
+WHERE posicao <= 20
+ORDER BY posicao;
